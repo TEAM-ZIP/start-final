@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "tailwind-scrollbar": "^3.1.0",
+    "tailwindcss-scrollbar": "^0.1.0"
+  }
+}

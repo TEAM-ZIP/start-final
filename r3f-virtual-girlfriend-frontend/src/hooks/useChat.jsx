@@ -6,6 +6,13 @@ const backendUrl = "http://localhost:3000";
 const ChatContext = createContext();
 
 export const ChatProvider = ({ children }) => {
+  const [systemRes, setSystemRes] = useState([
+    {
+      text: "안녕하세요! 자립 준비 청년들에게 맞는 정보를 제공해주는 쏙쏙이입니다! 궁금한 사항이 있으면 언제든지 물어보세요.",
+      type: "system",
+    },
+  ]);
+
   const chat = async (message) => {
     try {
       setLoading(true);
@@ -15,6 +22,12 @@ export const ChatProvider = ({ children }) => {
         console.log("메시지 전송 성공:", response.data.messages[0].text);
         const { messages: resp } = response.data;
         setMessages((prevMessages) => [...prevMessages, ...resp]);
+
+        const systemMessage = {
+          text: response.data.messages[0].text,
+          type: "system",
+        };
+        setSystemRes((prevMessages) => [...prevMessages, systemMessage]);
       } else {
         console.error(
           "메시지 전송 실패: ",
@@ -50,6 +63,8 @@ export const ChatProvider = ({ children }) => {
         chat,
         message,
         onMessagePlayed,
+        systemRes,
+        setSystemRes,
         loading,
         cameraZoomed,
         setCameraZoomed,

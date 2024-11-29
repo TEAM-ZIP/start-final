@@ -4,21 +4,13 @@ import MessageBox from "./MessageBox";
 
 export const UI = ({ hidden, ...props }) => {
   const input = useRef();
-  const { chat, loading, message } = useChat();
-  const [messages, setMessages] = useState([
-    {
-      text: "안녕하세요! 자립 준비 청년들에게 맞는 정보를 제공해주는 쏙쏙이입니다! 궁금한 사항이 있으면 언제든지 물어보세요.",
-      type: "system",
-    },
-  ]);
+  const { chat, loading, message, setSystemRes, systemRes } = useChat();
 
   const sendMessage = () => {
     const text = input.current.value;
     if (!loading && !message && text.trim() !== "") {
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        { text, type: "user" }, // 사용자가 입력한 메시지
-      ]);
+      const userMessage = { text, type: "user" };
+      setSystemRes((prevMessages) => [...prevMessages, userMessage]);
 
       chat(text);
       input.current.value = "";
@@ -38,7 +30,7 @@ export const UI = ({ hidden, ...props }) => {
           className="flex gap-3 mx-[100px] w-3/6 my-10 self-end flex-col max-h-[80%] overflow-y-auto z-10 pointer-events-auto scrollbar-thin scrollbar-thumb-[#9ABFA2] scrollbar-track-transparent "
           onWheel={(e) => e.stopPropagation()} // 휠 이벤트 차단
         >
-          {messages.map((msg, index) => (
+          {systemRes.map((msg, index) => (
             <MessageBox key={index} text={msg.text} type={msg.type} />
           ))}
         </div>

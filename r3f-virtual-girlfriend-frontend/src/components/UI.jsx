@@ -1,21 +1,27 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useChat } from "../hooks/useChat";
 import MessageBox from "./MessageBox";
 
 export const UI = ({ hidden, ...props }) => {
-  const input = useRef();
+  const endOfMessages = useRef();
   const { chat, loading, message, setSystemRes, systemRes } = useChat();
+  const [input, setInput] = useState("");
 
   const sendMessage = () => {
-    const text = input.current.value;
-    if (!loading && !message && text.trim() !== "") {
-      const userMessage = { text, type: "user" };
+    if (!loading && !message && input.trim() !== "") {
+      const userMessage = { text: input, type: "user" };
       setSystemRes((prevMessages) => [...prevMessages, userMessage]);
 
-      chat(text);
-      input.current.value = "";
+      chat(input);
+      setInput("");
     }
   };
+
+  useEffect(() => {
+    if (endOfMessages.current) {
+      endOfMessages.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [systemRes]);
 
   if (hidden) return null;
 
@@ -33,12 +39,14 @@ export const UI = ({ hidden, ...props }) => {
           {systemRes.map((msg, index) => (
             <MessageBox key={index} text={msg.text} type={msg.type} />
           ))}
+          <div ref={endOfMessages}></div>
         </div>
         <div className="flex items-center gap-2 max-w-screen-md w-full mx-auto pointer-events-auto">
           <input
             className="w-full placeholder:text-gray-600 placeholder:italic p-4 rounded-md bg-opacity-50 bg-white backdrop-blur-md"
             placeholder="자립 준비 청년 관련해서 궁금한 주거, 취업, 금융 정보를 물어보세요!"
-            ref={input}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 sendMessage();
